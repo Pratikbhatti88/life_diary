@@ -5,7 +5,7 @@ class PreferenceModel {
   String _themeColor = "";
   String _themeFontFamily = "";
   String _themeFontFamilySelected = "";
-  dynamic _fontSize="";
+  String _fontSize="";
 
   PreferenceModel();
 
@@ -41,9 +41,9 @@ class PreferenceModel {
 
   }
 
-  dynamic get themeFontData => _fontSize;
+  String get themeFontData => _fontSize;
 
-  set themeFont(dynamic value) {
+  set themeFont(String value) {
     _fontSize = value;
   }
 

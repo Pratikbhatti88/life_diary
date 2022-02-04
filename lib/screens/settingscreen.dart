@@ -35,6 +35,7 @@ class _SettingScreenState extends State<SettingScreen> {
   String? selectedFontData;
   String? getFontFamilyData;
   double? getFontSizeData = 10;
+  String? getFontStringData;
   double age = 10;
 
   Widget pickerLayoutBuilder(
@@ -254,9 +255,9 @@ class _SettingScreenState extends State<SettingScreen> {
   getFontSizeValue() async {
     PreferenceModel? themeData = await SharedPreference().getData();
     setState(() {
-      getFontSizeData;
+      getFontStringData;
     });
-    getFontSizeData = themeData!.themeFontData;
+    getFontStringData = themeData!.themeFontData;
   }
 
   void getFontStyle() {
@@ -348,13 +349,14 @@ class _SettingScreenState extends State<SettingScreen> {
                           Slider(
                             activeColor: Colors.black,
                             label: "Select Age",
-                            value: getFontSizeData!,
-                            onChangeEnd: (value) {
-                              print('enddata${value.toInt().toString()}');
+                            value: double.parse(getFontStringData!),
+                            onChangeEnd: (value) async {
+                              themeData!.themeFont = value.toInt().toString();
+                              await SharedPreference().addData(themeData);
                             },
                             onChanged: (value) {
                               setState(() {
-                                getFontSizeData = value;
+                                getFontStringData = value.toString();
                               });
                             },
                             min: 10,
@@ -388,6 +390,8 @@ class _SettingScreenState extends State<SettingScreen> {
   @override
   @override
   Widget build(BuildContext context) {
+    print('stringdata================');
+    print(getFontStringData);
     getcolorData();
 
     return Scaffold(
@@ -465,8 +469,11 @@ class _SettingScreenState extends State<SettingScreen> {
                                                   "Roboto-Bold")
                                           : index == 4
                                               ? TextStyle(
-                                                  fontSize: getFontSizeData!
-                                                      .toDouble())
+                                                  fontSize: getFontSizeData ==
+                                                          null
+                                                      ? getFontSizeData
+                                                      : double.parse(
+                                                          getFontStringData!))
                                               : textStyle16(
                                                   Settingscreenrighttxt),
                                     ),
