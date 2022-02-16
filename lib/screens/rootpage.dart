@@ -111,30 +111,32 @@ class _HomepageState extends State<Homepage> {
   @override
   Widget build(BuildContext context) {
     getcolorData();
-    return Scaffold(
-      backgroundColor: widget.otherColor,
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              getAppbar(),
-            ],
-          ),
-          Positioned(
-              bottom: deviceHeight(context) * 0.2,
-              left: deviceWidth(context) * 0.3,
-              child: Image.asset(
-                imgbackground,
-                height: deviceHeight(context) * 0.4,
-              ))
-        ],
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: widget.otherColor,
+        body: Stack(
+          children: [
+            Column(
+              children: [
+                getAppbar(),
+              ],
+            ),
+            Positioned(
+                bottom: deviceHeight(context) * 0.2,
+                left: deviceWidth(context) * 0.3,
+                child: Image.asset(
+                  imgbackground,
+                  height: deviceHeight(context) * 0.4,
+                ))
+          ],
+        ),
+        floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              Navigator.of(context).pushNamed(NoteScreen.route);
+            },
+            child: Icon(Icons.edit),
+            backgroundColor: appbarcolor),
       ),
-      floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.of(context).pushNamed(NoteScreen.route);
-          },
-          child: Icon(Icons.edit),
-          backgroundColor: appbarcolor),
     );
   }
 

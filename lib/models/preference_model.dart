@@ -5,7 +5,8 @@ class PreferenceModel {
   String _themeColor = "";
   String _themeFontFamily = "";
   String _themeFontFamilySelected = "";
-  String _fontSize="";
+  String _fontSize = "";
+  String passcode = "";
 
   PreferenceModel();
 
@@ -13,13 +14,15 @@ class PreferenceModel {
       : _themeColor = json['themeColorData'],
         _themeFontFamily = json['themeFontFamilyData'],
         _themeFontFamilySelected = json['themeFontFamilySelectedData'],
-        _fontSize=json['fontSizeData'];
+        _fontSize = json['fontSizeData'],
+        passcode = json['passcode'];
 
   Map<String, dynamic> toJson() => {
         'themeColorData': _themeColor,
         'themeFontFamilyData': _themeFontFamily,
         'themeFontFamilySelectedData': _themeFontFamilySelected,
-        'fontSizeData':_fontSize
+        'fontSizeData': _fontSize,
+        'passcode': passcode
       };
 
   String get themeColorData => _themeColor;
@@ -38,7 +41,6 @@ class PreferenceModel {
 
   set themeFontFamilySelected(String value) {
     _themeFontFamilySelected = value;
-
   }
 
   String get themeFontData => _fontSize;
@@ -47,9 +49,14 @@ class PreferenceModel {
     _fontSize = value;
   }
 
+  String get getPasscodeData => passcode;
+
+  set setPasscode(String value) {
+    passcode = value;
+  }
 
   @override
   String toString() {
-    return 'PreferenceModel{_themeColor: $_themeColor, _themeFontFamily: $_themeFontFamily, _themeFontFamilySelected: $_themeFontFamilySelected, _fontSize: $_fontSize}';
+    return 'PreferenceModel{_themeColor: $_themeColor, _themeFontFamily: $_themeFontFamily, _themeFontFamilySelected: $_themeFontFamilySelected, _fontSize: $_fontSize, passcode: $passcode}';
   }
 }

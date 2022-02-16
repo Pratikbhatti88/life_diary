@@ -1,8 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:life_diary_app/routes.dart';
 import 'package:life_diary_app/screens/splashscreen.dart';
 
-void main() {
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  AndroidInitializationSettings initializationSettingsAndroid =
+      const AndroidInitializationSettings('app_icon');
+  InitializationSettings initializationSettings =
+      InitializationSettings(android: initializationSettingsAndroid);
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+      onSelectNotification: (String? payload) async {
+    if (payload != null) {
+      debugPrint('notification payload: ' + payload);
+    }
+  });
   runApp(MyApp());
 }
 

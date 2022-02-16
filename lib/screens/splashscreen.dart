@@ -7,6 +7,9 @@ import 'package:life_diary_app/resources/Images.dart';
 import 'package:life_diary_app/resources/constant.dart';
 import 'package:life_diary_app/resources/diamensions.dart';
 import 'package:life_diary_app/screens/rootpage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'lock_screen.dart';
 
 class Splashscreen extends StatefulWidget {
   String? color;
@@ -19,22 +22,33 @@ class Splashscreen extends StatefulWidget {
 class _SplashscreenState extends State<Splashscreen> {
   @override
   void initState() {
-
     // TODO: implement initState
+    getPasscodeData();
     super.initState();
+  }
+
+  getPasscodeData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    PreferenceModel? themeData;
+    if (prefs.getString(themeDataKey) != null) {
+      themeData = await SharedPreference().getData();
+    } else {
+      themeData = PreferenceModel();
+    }
+
     Timer(
         Duration(seconds: 3),
-        () => Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => Homepage())));
+        () => themeData!.getPasscodeData.isEmpty
+            ? Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (context) => Homepage()))
+            : Navigator.of(context).pushNamed(LockScreen.route));
   }
 
   @override
   getcolorData() async {
-
-
     PreferenceModel? themeData = await SharedPreference().getData();
     setState(() {});
-    widget.color =themeData!.themeColorData;
+    widget.color = themeData!.themeColorData;
     String colorString = widget.color!; // Color(0x12345678)
     String valueString =
         colorString.split('(0x')[1].split(')')[0]; // kind of hacky..

@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:life_diary_app/core/prefrence.dart';
 import 'package:life_diary_app/models/preference_model.dart';
 import 'package:life_diary_app/models/settingscreenmodellist.dart';
 import 'package:life_diary_app/resources/constant.dart';
 import 'package:life_diary_app/resources/resources.dart';
+import 'package:life_diary_app/screens/lock_screen.dart';
 import 'package:life_diary_app/screens/rootpage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../main.dart';
 
 class SettingScreen extends StatefulWidget {
   dynamic color;
@@ -25,6 +29,7 @@ class SettingScreen extends StatefulWidget {
 }
 
 class _SettingScreenState extends State<SettingScreen> {
+  String? passcode;
   int _portraitCrossAxisCount = 4;
   int _landscapeCrossAxisCount = 5;
 
@@ -34,9 +39,15 @@ class _SettingScreenState extends State<SettingScreen> {
 
   String? selectedFontData;
   String? getFontFamilyData;
-  double? getFontSizeData = 10;
+  double getFontSizeData = 13;
   String? getFontStringData;
-  double age = 10;
+  bool isSwitched = false;
+  String? _chosenValue;
+  TimeOfDay? _selectedTime;
+  bool _isSelectTime = false;
+  String? time;
+  String defaultTime =
+      '${DateTime.now().hour}:${DateTime.now().minute} ${DateTime.now().second}';
 
   Widget pickerLayoutBuilder(
       BuildContext context, List<Color> colors, PickerItem child) {
@@ -312,9 +323,7 @@ class _SettingScreenState extends State<SettingScreen> {
 
   getFontSize() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-
     PreferenceModel? themeData;
-
     if (prefs.getString(themeDataKey) != null) {
       themeData = await SharedPreference().getData();
     } else {
@@ -349,7 +358,10 @@ class _SettingScreenState extends State<SettingScreen> {
                           Slider(
                             activeColor: Colors.black,
                             label: "Select Age",
-                            value: double.parse(getFontStringData!),
+                            value: getFontStringData == null ||
+                                    getFontStringData!.isEmpty
+                                ? getFontSizeData
+                                : double.parse(getFontStringData!),
                             onChangeEnd: (value) async {
                               themeData!.themeFont = value.toInt().toString();
                               await SharedPreference().addData(themeData);
@@ -357,15 +369,24 @@ class _SettingScreenState extends State<SettingScreen> {
                             onChanged: (value) {
                               setState(() {
                                 getFontStringData = value.toString();
+                                getFontSizeData = value;
                               });
                             },
-                            min: 10,
-                            max: 20,
+                            min: 12,
+                            max: 25,
                           ),
                           Text(
-                            getFontSizeData!.toInt().toString(),
+                            getFontStringData == null ||
+                                    getFontStringData!.isEmpty
+                                ? getFontSizeData.toInt().toString()
+                                : double.parse(getFontStringData!)
+                                    .toInt()
+                                    .toString(),
                             style: TextStyle(
-                              fontSize: getFontSizeData,
+                              fontSize: getFontStringData == null ||
+                                      getFontStringData!.isEmpty
+                                  ? getFontSizeData
+                                  : double.parse(getFontStringData!),
                             ),
                           ),
                         ],
@@ -379,19 +400,308 @@ class _SettingScreenState extends State<SettingScreen> {
         });
   }
 
+  passcodeRemove() async {
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    // PreferenceModel? themeData;
+    // if (prefs.getString(themeDataKey) != null) {
+    //   themeData = await SharedPreference().getData();
+    // } else {
+    //   themeData = PreferenceModel();
+    // }
+    await showDialog<Null>(
+        context: context,
+        builder: (BuildContext context) {
+          return Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.center,
+            children: <Widget>[
+              Positioned(
+                bottom: 200,
+                child: Container(
+                    width: deviceWidth(context) * 1,
+                    height: deviceHeight(context) * 0.15,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+                    child: Scaffold(
+                        //backgroundColor: widget.otherColor,
+                        body: Center(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Text(
+                            'What would you like to do?',
+                            style: textStyle18(appbarcolor),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) => LockScreen(
+                                            isOldPasscode: true,
+                                          )));
+                                },
+                                child: Text(
+                                  'Remove Passcode',
+                                  style: textStyle16(Settingscreenrighttxt),
+                                ),
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) => LockScreen(
+                                            isChangePasscode: true,
+                                          )));
+                                },
+                                child: Text(
+                                  'Change Passcode',
+                                  style: textStyle16(Settingscreenrighttxt),
+                                ),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ))),
+              )
+            ],
+          );
+        });
+  }
+
+  openLockScreen() {
+    Navigator.of(context).pushNamed(LockScreen.route);
+  }
+
+  getPasscodeData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    PreferenceModel? themeData;
+    if (prefs.getString(themeDataKey) != null) {
+      themeData = await SharedPreference().getData();
+    } else {
+      themeData = PreferenceModel();
+    }
+    passcode = themeData!.getPasscodeData;
+    setState(() {});
+  }
+
+  openReminderDialog() async {
+    await showDialog<Null>(
+
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(builder: (context, setState) {
+            return Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.center,
+              children: <Widget>[
+                Positioned(
+                  bottom: 200,
+                  child: Container(
+                      width: deviceWidth(context) * 1,
+                      height: deviceHeight(context) * 0.25,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+                      child: Scaffold(
+                          //backgroundColor: widget.otherColor,
+                          body: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: deviceWidth(context) * 0.05),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Reminder',
+                                  style: textStyle16(appbarcolor),
+                                ),
+                                InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      isSwitched = !isSwitched;
+                                    });
+                                  },
+                                  child: Text(
+                                    isSwitched ? 'ON' : 'OFF',
+                                    style: textStyle16(appbarcolor),
+                                  ),
+                                ),
+                                Switch(
+                                  value: isSwitched,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      isSwitched = value;
+                                      print(isSwitched);
+                                    });
+                                  },
+                                  activeTrackColor: Colors.black12,
+                                  activeColor: Colors.black,
+                                ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: deviceWidth(context) * 0.05),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Repeat',
+                                  style: textStyle16(appbarcolor),
+                                ),
+                                DropdownButton<String>(
+                                  underline: SizedBox(),
+                                  value: _chosenValue,
+                                  //elevation: 5,
+                                  style: textStyle16(Settingscreenrighttxt),
+
+                                  items: <String>[
+                                    'Daily',
+                                    'Weekly',
+                                    'Monthly',
+                                  ].map<DropdownMenuItem<String>>(
+                                      (String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(value),
+                                    );
+                                  }).toList(),
+                                  hint: Row(
+                                    children: [
+                                      Text(
+                                        "Daily",
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                      SizedBox(
+                                        width: deviceWidth(context) * 0.30,
+                                      )
+                                    ],
+                                  ),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _chosenValue = value;
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: deviceWidth(context) * 0.05),
+                            child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Time',
+                                    style: textStyle16(appbarcolor),
+                                  ),
+                                  InkWell(
+                                      onTap: () async {
+                                        await _presentTimePicker();
+                                        onSaveReminder();
+                                      },
+                                      child: Text(
+                                        time == null ? defaultTime : time!,
+                                        style:
+                                            textStyle16(Settingscreenrighttxt),
+                                      )),
+                                  SizedBox(
+                                    width: deviceWidth(context) * 0.02,
+                                  )
+                                ]),
+                          )
+                        ],
+                      ))),
+                )
+              ],
+            );
+          });
+        });
+  }
+
+  _presentTimePicker() async {
+    await showTimePicker(
+            context: context,
+            initialTime: TimeOfDay(
+                hour: DateTime.now().hour, minute: DateTime.now().minute))
+        .then((pickedTime) {
+      if (pickedTime == null) {
+        return;
+      }
+      setState(() {
+        _selectedTime = pickedTime;
+        _isSelectTime = true;
+        time =
+            '${_selectedTime!.hour}:${_selectedTime!.minute} ${_selectedTime!.period.name}';
+      });
+
+      Navigator.of(context).pop();
+    });
+    openReminderDialog();
+
+  }
+
+  void scheduleTextNotes(
+      DateTime scheduledNotificationDateTime, String textNotes) async {
+    var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
+      'textNotes_notify',
+      'Channel for textNotes notification',
+      icon: 'app_icon',
+      largeIcon: DrawableResourceAndroidBitmap('app_icon'),
+    );
+    var platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.schedule(0, 'Reminder', textNotes,
+        scheduledNotificationDateTime, platformChannelSpecifics);
+  }
+
+  void onSaveReminder([int? index, dynamic savedTextNote]) {
+    DateTime? scheduleTextNotesDateTime;
+    scheduleTextNotesDateTime = DateTime(
+        DateTime.now().year,
+        DateTime.now().month,
+        DateTime.now().day,
+        _selectedTime!.hour,
+        _selectedTime!.minute);
+
+    // print('=-=-=-=-=-=$_isSave');
+    // var textNoteInfo = TextNotes(
+    //     index == null ? textNoteModel.titleText : savedTextNote.titleText,
+    //     index == null ? textNoteModel.noteText : savedTextNote.noteText,
+    //     DateFormat().add_yMd().format(_selectedDate!),
+    //     '${_selectedTime!.hour}:${_selectedTime!.minute}');
+    scheduleTextNotes(scheduleTextNotesDateTime, 'start to write your note');
+    // print('------3----$isSave');
+    // _isSave ? Navigator.of(context).pop() : null;
+    // isSave ? null : Navigator.of(context).pop();
+    // loadAlarms();
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     getFontFamily();
     getFontSizeValue();
+    getPasscodeData();
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
-    print('stringdata================');
-    print(getFontStringData);
     getcolorData();
 
     return Scaffold(
@@ -452,7 +762,14 @@ class _SettingScreenState extends State<SettingScreen> {
                                           ? getFontStyle()
                                           : index == 4
                                               ? getFontSize()
-                                              : null;
+                                              : index == 5
+                                                  ? passcode == null ||
+                                                          passcode!.isEmpty
+                                                      ? openLockScreen()
+                                                      : passcodeRemove()
+                                                  : index == 6
+                                                      ? openReminderDialog()
+                                                      : null;
                                     },
                                     child: Text(
                                       index == 3
@@ -460,7 +777,20 @@ class _SettingScreenState extends State<SettingScreen> {
                                                   selectedFontData!.isEmpty
                                               ? screenData[index].rightsidetxt
                                               : selectedFontData
-                                          : screenData[index].rightsidetxt,
+                                          : index == 5
+                                              ? passcode == null ||
+                                                      passcode!.isEmpty
+                                                  ? screenData[index]
+                                                      .rightsidetxt
+                                                  : 'Enabled'
+                                              : index == 6
+
+                                                  ? !isSwitched
+                                                      ? 'OFF'
+                                                      : screenData[index]
+                                                          .rightsidetxt
+                                                  : screenData[index]
+                                                      .rightsidetxt,
                                       style: index == 3
                                           ? TextStyle(
                                               fontSize: 16,
@@ -469,8 +799,10 @@ class _SettingScreenState extends State<SettingScreen> {
                                                   "Roboto-Bold")
                                           : index == 4
                                               ? TextStyle(
-                                                  fontSize: getFontSizeData ==
-                                                          null
+                                                  fontSize: getFontStringData ==
+                                                              null ||
+                                                          getFontStringData!
+                                                              .isEmpty
                                                       ? getFontSizeData
                                                       : double.parse(
                                                           getFontStringData!))

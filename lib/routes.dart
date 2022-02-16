@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:life_diary_app/resources/colors.dart';
+import 'package:life_diary_app/screens/lock_screen.dart';
 import 'package:life_diary_app/screens/note_screen.dart';
 import 'package:life_diary_app/screens/photoviewscreen.dart';
 import 'package:life_diary_app/screens/rootpage.dart';
@@ -45,6 +46,10 @@ Route onGenerateRoute(RouteSettings routeSettings) {
       );
     case NoteScreen.route:
       return MaterialPageRoute(builder: (_) => NoteScreen());
+
+    case LockScreen.route:
+      return MaterialPageRoute(builder: (_) => LockScreen());
+
     default:
       return MaterialPageRoute(builder: (_) => Container());
   }

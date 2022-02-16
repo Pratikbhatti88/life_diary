@@ -20,7 +20,8 @@ class NoteScreen extends StatefulWidget {
   TimeOfDay? _selectedTime;
   bool _isSelectTime = false;
   String? time;
-  double _value = 5;
+  double? getFontSizeData = 10;
+  String? getFontStringData;
 
   @override
   _NoteScreenState createState() => _NoteScreenState();
@@ -50,6 +51,13 @@ class _NoteScreenState extends State<NoteScreen> {
     widget.getFontFamilyData = themeData.themeFontFamilyData;
     print('data=============');
     print(widget.getFontFamilyData);
+  }
+
+  getFontSizeValue() async {
+    PreferenceModel? themeData = await SharedPreference().getData();
+
+    widget.getFontStringData = themeData!.themeFontData;
+    setState(() {});
   }
 
   void _presentDatePicker() {
@@ -96,10 +104,13 @@ class _NoteScreenState extends State<NoteScreen> {
     super.initState();
     getcolorData();
     getFontFamily();
+    getFontSizeValue();
   }
 
   @override
   Widget build(BuildContext context) {
+    print('getfontdata=========');
+    print(widget.getFontStringData);
     getcolorData();
     return Scaffold(
         backgroundColor: widget.otherColor,
@@ -131,8 +142,6 @@ class _NoteScreenState extends State<NoteScreen> {
     );
   }
 
-
-
   Widget getBody() {
     return Padding(
         padding: const EdgeInsets.all(8.0),
@@ -150,11 +159,14 @@ class _NoteScreenState extends State<NoteScreen> {
                     width: deviceWidth(context) * 0.02,
                   ),
                   Text(
-                    '${widget.day ?? DateFormat().add_EEEE().format(DateTime.now())}${','}${widget.date ?? DateFormat().add_yMMMd().format(DateTime.now())} ${widget.time ?? defaultTime} ',
-                    style: TextStyle(
-                        fontFamily: widget.getFontFamilyData ?? "Lato-Bold",
-                        fontSize: 16),
-                  ),
+                      '${widget.day ?? DateFormat().add_EEEE().format(DateTime.now())}${','}${widget.date ?? DateFormat().add_yMMMd().format(DateTime.now())} ${widget.time ?? defaultTime} ',
+                      style: TextStyle(
+                          fontFamily: widget.getFontFamilyData ?? "Lato-Bold",
+                          fontSize: widget.getFontStringData == null ||
+                                  widget.getFontStringData!.isEmpty
+                              ? widget.getFontSizeData
+                              : double.parse(
+                                  widget.getFontStringData.toString()))),
                 ],
               ),
             ),
@@ -163,7 +175,10 @@ class _NoteScreenState extends State<NoteScreen> {
             ),
             TextField(
               style: TextStyle(
-                  fontSize: 18,
+                  fontSize: widget.getFontStringData == null ||
+                          widget.getFontStringData!.isEmpty
+                      ? widget.getFontSizeData
+                      : double.parse(widget.getFontStringData.toString()),
                   fontFamily: widget.getFontFamilyData ?? "Lato-Bold"),
               autofocus: true,
               decoration: InputDecoration(

@@ -10,6 +10,7 @@ class SharedPreference {
     String userdata = jsonEncode(themeData);
     print(userdata);
     prefs.setString(themeDataKey, userdata);
+
   }
 
 
@@ -20,4 +21,8 @@ class SharedPreference {
     PreferenceModel themeData = PreferenceModel.fromJson(jsondetails);
     return themeData;
   }
+
+
+
+
 }
