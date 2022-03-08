@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:life_diary_app/core/prefrence.dart';
+import 'package:life_diary_app/models/notedatastore.dart';
 import 'package:life_diary_app/models/preference_model.dart';
 import 'package:life_diary_app/resources/resources.dart';
 import 'package:life_diary_app/screens/note_screen.dart';
@@ -12,6 +13,8 @@ class Homepage extends StatefulWidget {
 
   String? color;
   Color? otherColor;
+  String? getFontFamilyData;
+  String? getFontStringData;
 
   Homepage({this.color});
 
@@ -101,33 +104,168 @@ class _HomepageState extends State<Homepage> {
     setState(() {});
   }
 
+  getFontFamily() async {
+    PreferenceModel? themeData = await SharedPreference().getData();
+    print(themeData!.themeFontFamilySelectedData);
+
+    widget.getFontFamilyData = themeData.themeFontFamilyData;
+    print('data=============');
+    print(widget.getFontFamilyData);
+  }
+
+  getFontSizeValue() async {
+    PreferenceModel? themeData = await SharedPreference().getData();
+
+    widget.getFontStringData = themeData!.themeFontData;
+    setState(() {});
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     getcolorData();
+    getFontFamily();
+    getFontSizeValue();
   }
 
   @override
   Widget build(BuildContext context) {
+    getFontSizeValue();
+    getFontFamily();
+    print('listData=====================');
+    print(storeNoteData);
     getcolorData();
+
+    uniqueValue = List.generate(uniqueDate.length, (index) => false);
+    print('---dateLength----${uniqueDate.length}');
+    print('---ValueLength----${uniqueValue.length}');
+
     return SafeArea(
       child: Scaffold(
         backgroundColor: widget.otherColor,
         body: Stack(
           children: [
-            Column(
-              children: [
-                getAppbar(),
-              ],
-            ),
             Positioned(
                 bottom: deviceHeight(context) * 0.2,
                 left: deviceWidth(context) * 0.3,
                 child: Image.asset(
                   imgbackground,
                   height: deviceHeight(context) * 0.4,
-                ))
+                )),
+            Column(
+              children: [
+                getAppbar(),
+                Container(
+                    height: deviceHeight(context) * 0.11,
+                    child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: uniqueDate.length,
+                        itemBuilder: (context, i) {
+                          return Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: deviceWidth(context) * 0.02,
+                                vertical: deviceHeight(context) * 0.015),
+                            child: InkWell(
+                              onTap: () {
+                                uniqueValue.forEach((element) {
+                                  if (element == true) {
+                                    uniqueValue[uniqueValue.indexOf(element)] =
+                                        false;
+                                  }
+                                });
+                                setState(() {
+                                  uniqueValue[i] = !uniqueValue[i];
+                                });
+                                print('==xxx===$uniqueValue');
+                                print(
+                                    '=-=----${uniqueDate[uniqueValue.indexOf(true)]}');
+                              },
+                              child: Container(
+                                height: deviceHeight(context) * 0.13,
+                                width: deviceWidth(context) * 0.17,
+                                child: Padding(
+                                  padding: EdgeInsets.all(4),
+                                  child: Text(uniqueDate[i],
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontFamily: widget.getFontFamilyData,
+                                          fontSize: double.parse(
+                                              widget.getFontStringData!))),
+                                ),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                        color: Colors.black,
+                                        width: uniqueValue[i] ? 3 : 1)),
+                              ),
+                            ),
+                          );
+                        })),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: storeNoteData.length,
+                    itemBuilder: (context, index) {
+                      // print('---=x=x=----${storeNoteData[index].date ==
+                      //     uniqueDate[uniqueValue.indexOf(true)]}');
+                      return storeNoteData[index].date ==
+                          uniqueDate[uniqueValue.indexOf(true)] ? Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: deviceWidth(context) * 0.02,
+                            vertical: deviceHeight(context) * 0.01),
+                        child: Container(
+                            decoration: BoxDecoration(
+                                color: whitecolor,
+                                borderRadius: BorderRadius.circular(5)),
+                            height: deviceHeight(context) * 0.13,
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                  left: deviceWidth(context) * 0.025,
+                                  top: deviceHeight(context) * 0.01),
+                              child: Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.calendar_today_outlined,
+                                        color: Colors.deepPurple,
+                                      ),
+                                      SizedBox(
+                                        width:
+                                            deviceWidth(context) * 0.02,
+                                      ),
+                                      Text(
+                                        storeNoteData[index].date,
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontFamily:
+                                                widget.getFontFamilyData,
+                                            fontSize: double.parse(widget
+                                                .getFontStringData!)),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: deviceHeight(context) * 0.02,
+                                  ),
+                                  Text(storeNoteData[index].message,
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontFamily:
+                                              widget.getFontFamilyData,
+                                          fontSize: double.parse(widget
+                                              .getFontStringData!))),
+                                ],
+                              ),
+                            )),
+                      ) : Container();
+                    },
+                  ),
+                )
+              ],
+            ),
           ],
         ),
         floatingActionButton: FloatingActionButton(

@@ -1,6 +1,3 @@
-import 'package:flutter/cupertino.dart';
-import 'package:life_diary_app/resources/colors.dart';
-
 class PreferenceModel {
   String _themeColor = "";
   String _themeFontFamily = "";

@@ -283,7 +283,7 @@ class _SettingScreenState extends State<SettingScreen> {
             children: [
               Expanded(
                 child: ListView.builder(
-                    itemCount: Fonts.length,
+                    itemCount: fonts.length,
                     itemBuilder: (context, index) {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -291,7 +291,7 @@ class _SettingScreenState extends State<SettingScreen> {
                           InkWell(
                             onTap: () {
                               setState(() {
-                                selectedFontData = Fonts[index].data;
+                                selectedFontData = fonts[index].data;
                                 storeFontFamily(
                                     fontfamily: getTextStyle(index: index),
                                     fontFamilyselectedData: selectedFontData!);
@@ -301,7 +301,7 @@ class _SettingScreenState extends State<SettingScreen> {
                                   arguments: widget.currentColor);
                             },
                             child: Text(
-                              Fonts[index].data,
+                              fonts[index].data,
                               style: TextStyle(
                                   fontSize: 18,
                                   fontFamily: getTextStyle(index: index)),
@@ -491,7 +491,6 @@ class _SettingScreenState extends State<SettingScreen> {
 
   openReminderDialog() async {
     await showDialog<Null>(
-
         context: context,
         builder: (BuildContext context) {
           return StatefulBuilder(builder: (context, setState) {
@@ -612,7 +611,7 @@ class _SettingScreenState extends State<SettingScreen> {
                                   InkWell(
                                       onTap: () async {
                                         await _presentTimePicker();
-                                        onSaveReminder();
+                                        isSwitched ? onSaveReminder() : null;
                                       },
                                       child: Text(
                                         time == null ? defaultTime : time!,
@@ -652,7 +651,6 @@ class _SettingScreenState extends State<SettingScreen> {
       Navigator.of(context).pop();
     });
     openReminderDialog();
-
   }
 
   void scheduleTextNotes(
@@ -784,7 +782,6 @@ class _SettingScreenState extends State<SettingScreen> {
                                                       .rightsidetxt
                                                   : 'Enabled'
                                               : index == 6
-
                                                   ? !isSwitched
                                                       ? 'OFF'
                                                       : screenData[index]

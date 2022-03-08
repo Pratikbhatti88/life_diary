@@ -1,11 +1,13 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:life_diary_app/core/prefrence.dart';
 import 'package:life_diary_app/models/preference_model.dart';
-import 'package:life_diary_app/resources/colors.dart';
-import 'package:life_diary_app/resources/diamensions.dart';
 import 'package:life_diary_app/resources/icons.dart';
 import 'package:life_diary_app/resources/resources.dart';
+
+import '../models/notedatastore.dart';
 
 class NoteScreen extends StatefulWidget {
   static const route = 'note_screen';
@@ -28,6 +30,8 @@ class NoteScreen extends StatefulWidget {
 }
 
 class _NoteScreenState extends State<NoteScreen> {
+  TextEditingController _textController = TextEditingController();
+
   String defaultTime =
       '${DateTime.now().hour}:${DateTime.now().minute} ${DateTime.now().second}';
 
@@ -109,13 +113,13 @@ class _NoteScreenState extends State<NoteScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print('getfontdata=========');
-    print(widget.getFontStringData);
-    getcolorData();
+    // print('getfontdata=========');
+    // print(widget.getFontStringData);
+    // getcolorData();
     return Scaffold(
         backgroundColor: widget.otherColor,
         appBar: getAppBar(),
-        body: getBody());
+        body: getBody(context));
   }
 
   PreferredSizeWidget getAppBar() {
@@ -142,7 +146,7 @@ class _NoteScreenState extends State<NoteScreen> {
     );
   }
 
-  Widget getBody() {
+  Widget getBody(BuildContext context) {
     return Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -174,6 +178,7 @@ class _NoteScreenState extends State<NoteScreen> {
               height: deviceHeight(context) * 0.02,
             ),
             TextField(
+              controller: _textController,
               style: TextStyle(
                   fontSize: widget.getFontStringData == null ||
                           widget.getFontStringData!.isEmpty
@@ -189,20 +194,38 @@ class _NoteScreenState extends State<NoteScreen> {
             Spacer(),
             Row(
               children: [
-                bottomIcon(data: Icons.camera_alt),
+                bottomIcon(Icons.camera_alt, () {}),
                 SizedBox(
                   width: deviceWidth(context) * 0.02,
                 ),
-                bottomIcon(data: Icons.mic),
+                bottomIcon(Icons.mic, () {}),
                 Spacer(),
-                bottomIcon(data: checkIcon),
+                bottomIcon(Icons.done, () {
+                  dates.add(widget.date ??
+                      DateFormat().add_yMMMd().format(DateTime.now()));
+                  print('-=====dates=====$dates');
+
+                  uniqueDate = dates.toSet().toList();
+                  uniqueDate.sort((a, b) => a.compareTo(b));
+                  print('----uniqueDate----$uniqueDate');
+
+                  storeNoteData.add(NoteDataStore(
+                      day:
+                          '${widget.day ?? DateFormat().add_EEEE().format(DateTime.now())}}',
+                      date:
+                          '${widget.date ?? DateFormat().add_yMMMd().format(DateTime.now())}',
+                      time: '${widget.time ?? defaultTime}',
+                      message: _textController.text));
+
+                  Navigator.of(context).pop();
+                }),
               ],
             )
           ],
         ));
   }
 
-  Widget bottomIcon({dynamic data}) {
+  Widget bottomIcon(IconData icon, Function() onClick) {
     return Container(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
@@ -210,16 +233,14 @@ class _NoteScreenState extends State<NoteScreen> {
       ),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: data.runtimeType == String
-            ? Image.asset(
-                data,
-                height: deviceHeight(context) * 0.03,
-                color: whitecolor,
-              )
-            : Icon(
-                data,
-                color: Colors.white,
-              ),
+        child: InkWell(
+          onTap: onClick,
+          child: Icon(
+            icon,
+            size: deviceHeight(context) * 0.03,
+            color: whitecolor,
+          ),
+        ),
       ),
     );
   }

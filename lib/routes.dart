@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:life_diary_app/resources/colors.dart';
 import 'package:life_diary_app/screens/lock_screen.dart';
 import 'package:life_diary_app/screens/note_screen.dart';
 import 'package:life_diary_app/screens/photoviewscreen.dart';
@@ -8,8 +6,6 @@ import 'package:life_diary_app/screens/rootpage.dart';
 import 'package:life_diary_app/screens/searchscreen.dart';
 import 'package:life_diary_app/screens/settingscreen.dart';
 import 'package:life_diary_app/screens/splashscreen.dart';
-
-import 'blocs/fontfamily/font_family_bloc.dart';
 
 Route onGenerateRoute(RouteSettings routeSettings) {
   final arguments = routeSettings.arguments;

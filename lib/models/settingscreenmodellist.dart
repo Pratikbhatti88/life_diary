@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:life_diary_app/resources/Images.dart';
 import 'package:life_diary_app/resources/colors.dart';
@@ -94,4 +93,4 @@ class FontData {
   FontData(this.data);
 }
 
-List<FontData> Fonts = [FontData('Roboto'), FontData('Roboto Bold'),FontData('Lato'),FontData('Lato Bold'),FontData('lobster'),FontData('indie flower'),FontData('Dancing Seript'),FontData('Caveat'),FontData('great vibes'),FontData('pacifico'),FontData('Saira')];
+List<FontData> fonts = [FontData('Roboto'), FontData('Roboto Bold'),FontData('Lato'),FontData('Lato Bold'),FontData('lobster'),FontData('indie flower'),FontData('Dancing Seript'),FontData('Caveat'),FontData('great vibes'),FontData('pacifico'),FontData('Saira')];

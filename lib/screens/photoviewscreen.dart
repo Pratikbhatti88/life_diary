@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:life_diary_app/core/prefrence.dart';
 import 'package:life_diary_app/models/preference_model.dart';
-import 'package:life_diary_app/resources/constant.dart';
 import 'package:life_diary_app/resources/resources.dart';
 
 class GallryScreen extends StatefulWidget {
